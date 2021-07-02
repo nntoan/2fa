@@ -1,70 +1,72 @@
-<!DOCTYPE html>
-<html>
-
+<!doctype html>
+<html lang="vi">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>2FA @nntoan</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Get 2FA faster!">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.0/css/bootstrap.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>2FA @ nntoan</title>
+    <link rel="canonical" href="https://2fa.nntoan.com">
+    <link rel="alternate" href="https://2fa.nntoan.com/en" hreflang="en-us" />
+    <link rel="alternate" href="https://2fa.nntoan.com/vi" hreflang="vi-vn" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        @media screen and (min-width: 1068px) {
-            .container {
-                max-width: 600px;
-                width: 600px;
-            }
+        html {
+            font-size: 14px
+        }
 
-            .h1 {
-                color: red;
+        @media (min-width:768px) {
+            html {
+                font-size: 16px
             }
+        }
 
-            h1.title {
-                text-align: center;
-            }
+        .container {
+            max-width: 960px
+        }
+
+        .pricing-header {
+            max-width: 700px
+        }
+
+        .card-deck .card {
+            min-width: 220px
         }
     </style>
 </head>
 <body>
-    <div id="fb-root"></div>
-    <section id="app" class="section">
-        <div class="container">
-            <h1 class="title">Get 2FA Online @nntoan</h1>
-            <div class="field">
-                <label class="label is-uppercase">Secret Key</label>
-                <div class="control">
-                    <input class="input" type="text" v-model="secret_key"
-                        placeholder="The secret key (in base-32 format)">
-                </div>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal">2FA</h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="https://nntoan.com" target="_blank" title="@nntoan">@nntoan</a>
+        </nav>
+    </div>
+    <div class="container">
+        <form class="mt-4" id="form_secret" method="post">
+            <div class="form-group">
+                <label for="SECRET2FA">Secret Key</label>
+                <textarea class="form-control" name="SECRET2FA" id="SECRET2FA" rows="4"
+                    placeholder="5NQV HJNP QCNP JJIY ... &#x0a;L2WA M4BZ RBM2 YVJP ..."></textarea>
+                <small id="SECRET2FA" class="form-text text-muted">Chỉ chấp nhận chữ cái, số và khoảng cách. Mỗi dòng sẽ
+                    lấy 1 code.</small>
             </div>
-            <div class="content">
-                <span class="has-text-grey is-size-7">Hết hạn sau: {{ updatingIn }} giây</span>
-                <progress class="progress is-success is-small" v-bind:value="period - updatingIn" :max="period"></progress>
-            </div>
-            <div class="box">
-                <p class="title is-size-1 has-text-centered">{{ token }}</p>
-            </div>
-            <div class="field" style="visibility: hidden; display: none;">
-                <label class="label is-uppercase">Số ký tự</label>
-                <div class="control">
-                    <input class="input" type="text" v-model="digits" placeholder="Usually 6">
-                </div>
-            </div>
-            <div class="field" style="visibility: hidden; display: none;">
-                <label class="label is-uppercase">Thời gian khả dụng</label>
-                <div class="control">
-                    <input class="input" type="text" v-model="period" placeholder="Usually 30">
-                </div>
-            </div>
+            <button type="submit" class="btn btn-primary">LẤY CODE</button>
+        </form>
+        <div class="mt-3 table_list_code" style="display:none;">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col text-center" style="width:120px; text-align:center">CODE</th>
+                        <th scope="col text-center">Secret Key</th>
+                    </tr>
+                </thead>
+                <tbody id="newlistsecret">
+                </tbody>
+            </table>
         </div>
-    </section>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.min.js"></script>
-    <script src="https://unpkg.com/otpauth@3.1.3/dist/otpauth.min.js"></script>
-    <script src="js/app.js?v=3"></script>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script>function remove_hash_from_url() { var uri = window.location.toString(); if (uri.indexOf("#") > 0) { var clean_uri = uri.substring(0, uri.indexOf("#")); window.history.replaceState({}, document.title, clean_uri); } } function copy(id) { var copyText = document.getElementById(id); copyText.select(); copyText.setSelectionRange(0, 99999); document.execCommand("copy"); } function load2fa() { if ($(".show_code").length > 0) { var secrets = []; $(".show_code").each(function (index) { var SECRET = $(this).find('input[name="secret"]').val(); secrets.push(SECRET); }); var myJSON = JSON.stringify(secrets); $.ajax({ url: 'https://cors.nntoan.com/https://2fa.vn/server', type: 'POST', data: myJSON, data: { 'secrets': myJSON }, dataType: 'json', success: function (msg) { var changecode = 0; $.each(msg['2fa'], function (i, item) { var oldcode = $("#secret" + i).find('input[name="code"]').val(); if (oldcode != item['code']) { $("#secret" + i).find('input[name="code"]').val(item['code']); console.log(i + "------" + item['code']); changecode = 1; } }); if (changecode == 1) { setTimeout(function () { $('input[name="code"]').removeClass("bg-dark"); $('input[name="code"]').removeClass("text-light"); setTimeout(function () { $('input[name="code"]').addClass("bg-dark"); $('input[name="code"]').addClass("text-light"); }, 1000); }, 1000); } }, }) } } function runsend() { if ($(".show_code").length > 0) { load2fa(); } setTimeout(function () { runsend(); }, 3000); } $("#form_secret").submit(function (event) { var SECRET2FA = $("#SECRET2FA").val(); var ksx = SECRET2FA.split(/\r?\n/); var ks = []; $.each(ksx, function (i, el) { if ($.inArray(el, ks) === -1 && el != "") ks.push(el); }); if (ks.length > 0) { var htmls = ""; $("#newlistsecret").html(""); $.each(ks, function (k) { secret = ks[k].replace(/ /g, ''); if (/^[a-zA-Z0-9- ]*$/.test(secret) == false) { htmls = '<tr><td><input type="text" class="form-control bg-dark text-light font-weight-bold" style="text-align:center" value="ERROR"  readonly></td><td><input type="text" class="form-control" value="' + secret + '" readonly></td></tr>'; $("#newlistsecret").append(htmls); } else { htmls = '<tr class="show_code" id="secret' + secret + '" ><td><input id="input' + secret + '" type="text" class="form-control bg-dark text-light font-weight-bold" style="text-align:center" value="......" onclick="copy(\'input' + secret + '\');" name="code" readonly><div class="progress" style="height: 1px;"><div class="progress-bar" role="progressbar" style="width: 0%;"></div></div></td><td><input type="text" class="form-control" value="' + secret + '"  name="secret" readonly></td></tr>'; $("#newlistsecret").append(htmls); } }); $(".table_list_code").show(); } else { alert('Bạn chưa nhập SECRET KEY'); } event.preventDefault(); load2fa(); }); runsend(); var secretu = window.location.hash.split('#'); if (secretu[1] !== "undefined" && 1 in secretu) { if (secretu[1].length == 32) { $('textarea[name="SECRET2FA"]').val(secretu[1]); $('textarea[name="SECRET2FA"]').submit(); } } remove_hash_from_url();</script>
 </body>
-
 </html>
